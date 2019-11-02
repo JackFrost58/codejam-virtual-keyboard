@@ -1,9 +1,8 @@
-const TextPlace = document.createElement('textarea');
 const keyboard = document.createElement('div');
-
 const swither = ['off', 'on'];
 const state = ['down', 'up'];
-const KeyArray = ['ctrl', 'win', 'alt', 'space', 'alt', 'arrow', 'arrow', 'arrow', 'ctrl'];
+const ClassArray = ['ctrl', 'win', 'alt', 'space', 'alt', 'arrow', 'arrow', 'arrow', 'ctrl'];
+
 const keyRow1 = [
   ['Backquote', 'ё', 'Ё', '`', '~'],
   ['Digit1', '1', '!', '1', '!'],
@@ -71,7 +70,20 @@ const keyRow4 = [
   ['ShiftRight', 'Shift', 'Shift', 'Shift', 'Shift'],
 ];
 
+const keyRow5 = [
+  ['ControlLeft', 'Ctrl', 'Ctrl', 'Ctrl', 'Ctrl'],
+  ['MetaLeft', 'Win', 'Win', 'Win', 'Win'],
+  ['AltLeft', 'Alt', 'Alt', 'Alt', 'Alt'],
+  ['Space', 'Space', 'Space', 'Space', 'Space'],
+  ['AltRight', 'Alt', 'Alt', 'Alt', 'Alt'],
+  ['ArrowLeft', '◄', '◄', '◄', '◄'],
+  ['ArrowDown', '▼', '▼', '▼', '▼'],
+  ['ArrowRight', '►', '►', '►', '►'],
+  ['ControlRight', 'Ctrl', 'Ctrl', 'Ctrl', 'Ctrl'],
+];
+
 function CreateTextArea() {
+  const TextPlace = document.createElement('textarea');
   TextPlace.id = 'result';
   TextPlace.rows = '6';
   TextPlace.cols = '60';
@@ -84,14 +96,14 @@ function CreateKeyboard() {
 }
 
 function CreateButtons(firstButton, lastButton, count, array) {
-  const row = document.createElement('div');
-  row.className = 'row';
-  keyboard.append(row);
+  const CreateRow = document.createElement('div');
+  CreateRow.className = 'row';
+  keyboard.append(CreateRow);
   if (firstButton === '') {
     const first = document.createElement('div');
     first.className = 'key';
 
-    //Function add span
+    // Function add span
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
       NameButton.classList.add(array[0][0], swither[k]);
@@ -105,7 +117,7 @@ function CreateButtons(firstButton, lastButton, count, array) {
       first.append(NameButton);
     }
     //
-    row.append(first);
+    CreateRow.append(first);
   } else {
     const first = document.createElement('div');
     first.classList.add('key', firstButton);
@@ -120,11 +132,11 @@ function CreateButtons(firstButton, lastButton, count, array) {
       }
       first.append(NameButton);
     }
-    row.append(first);
+    CreateRow.append(first);
   }
   for (let j = 0; j < count; j += 1) {
-    const key = document.createElement('div');
-    key.className = 'key';
+    const CreateKey = document.createElement('div');
+    CreateKey.className = 'key';
     //
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
@@ -135,13 +147,13 @@ function CreateButtons(firstButton, lastButton, count, array) {
         caseName.innerHTML = array[j + 1][m];
         NameButton.append(caseName);
       }
-      key.append(NameButton);
+      CreateKey.append(NameButton);
     }
-    row.append(key);
+    CreateRow.append(CreateKey);
   }
   const last = document.createElement('div');
   last.classList.add('key', lastButton);
-  row.append(last);
+  CreateRow.append(last);
   //
   for (let k = 0; k < 2; k += 1) {
     const NameButton = document.createElement('span');
@@ -156,47 +168,78 @@ function CreateButtons(firstButton, lastButton, count, array) {
   }
 }
 
+function CreateControlButtons(array, keyRow) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  keyboard.append(row);
+  for (let j = 0; j < array.length; j += 1) {
+    const key = document.createElement('div');
+    key.classList.add('key', array[j]);
+    for (let k = 0; k < 2; k += 1) {
+      const NameButton = document.createElement('span');
+      NameButton.classList.add(keyRow[j][0], swither[k]);
+      for (let m = 1; m < 3; m += 1) { // problem with English word
+        const caseName = document.createElement('span');
+        caseName.classList.add('case', state[m - 1]);
+        caseName.innerHTML = keyRow[j][m];
+        NameButton.append(caseName);
+      }
+      key.append(NameButton);
+      row.append(key);
+    }
+  }
+}
+
 CreateTextArea();
 CreateKeyboard();
 CreateButtons('', 'backspace', 12, keyRow1);
 CreateButtons('tab', 'del', 13, keyRow2);
 CreateButtons('capslock', 'enter', 11, keyRow3);
 CreateButtons('shift', 'shift-right', 11, keyRow4);
+CreateControlButtons(ClassArray, keyRow5);
 
-for (let i = 0; i < 1; i += 1) {
-  const row = document.createElement('div');
-  row.className = 'row';
-  keyboard.append(row);
-  for (let j = 0; j < KeyArray.length; j += 1) {
-    const key = document.createElement('div');
-    key.classList.add('key', KeyArray[j]);
-    row.append(key);
-  }
-}
+const TextArea = document.getElementById('result');
+let key = Array.from(document.getElementsByClassName('key'));
 
+key.forEach((element, index) => {
+  element.addEventListener('mousedown', () => {
+    key[index].classList.add('active');
+    TextArea.value += key[index].lastElementChild.lastElementChild.textContent;
+  });
+  element.addEventListener('mouseup', () => {
+    key[index].classList.remove('active');
+  });
+});
 
 window.addEventListener('keydown', (event) => {
   if (event.code) {
     const button = document.getElementsByClassName(event.code);
     button[0].parentElement.classList.add('active');
   }
+
   if (event.code === 'CapsLock') {
-    const up = document.getElementsByClassName('up');
-    const down = document.getElementsByClassName('down');
-    if (up[0].style.display === 'block') {
-      for (let i = 0; i < up.length; i += 1) {
-        up[i].style.display = 'none';
-        down[i].style.display = 'block';
-      }
-    } else {
-      for (let i = 0; i < up.length; i += 1) {
-        up[i].style.display = 'block';
-        down[i].style.display = 'none';
-      }
+    const up = document.getElementsByClassName('case');
+    for (let i = 0; i < up.length; i += 1) {
+      up[i].classList.toggle('up');
+      up[i].classList.toggle('down');
     }
   }
-  if (event.code === 'Shift' && event.code === 'AltLeft') {
-    alert('lol');
+
+  if (event.altKey && event.shiftKey) {
+    const off = document.getElementsByClassName('off');
+    const on = document.getElementsByClassName('on');
+    console.log(off);
+    if (off[0].style.display === 'block') {
+      for (let i = 0; i < off.length; i += 1) {
+        off[i].style.display = 'none';
+        on[i].style.display = 'block';
+      }
+    } else {
+      for (let i = 0; i < off.length; i += 1) {
+        off[i].style.display = 'block';
+        on[i].style.display = 'none';
+      }
+    }
   }
 });
 
@@ -206,3 +249,10 @@ window.addEventListener('keyup', (event) => {
     button[0].parentElement.classList.remove('active');
   }
 });
+
+// local storage
+
+TextArea.value = localStorage.getItem('area');
+TextArea.oninput = () => {
+  localStorage.setItem('area', TextArea.value);
+};

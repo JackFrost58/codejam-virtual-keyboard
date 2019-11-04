@@ -15,8 +15,8 @@ const keyRow1 = [
   ['Digit8', '8', '*', '8', '*'],
   ['Digit9', '9', '(', '9', '('],
   ['Digit0', '0', ')', '0', ')'],
-  ['Digit-', '-', '_', '-', '_'],
-  ['Equal=', '=', '+', '=', '+'],
+  ['Minus', '-', '_', '-', '_'],
+  ['Equal', '=', '+', '=', '+'],
   ['Backspace', 'Backspace', 'Backspace', 'Backspace', 'Backspace'],
 ];
 
@@ -96,6 +96,7 @@ function CreateKeyboard() {
 }
 
 function CreateButtons(firstButton, lastButton, count, array) {
+  let position = 0;
   const CreateRow = document.createElement('div');
   CreateRow.className = 'row';
   keyboard.append(CreateRow);
@@ -107,13 +108,13 @@ function CreateButtons(firstButton, lastButton, count, array) {
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
       NameButton.classList.add(array[0][0], swither[k]);
-      for (let m = 1; m < 3; m += 1) {
+      for (let m = 0; m < 2; m += 1) {
+        position += 1;
         const caseName = document.createElement('span');
-        caseName.classList.add('case', state[m - 1]);
-        caseName.innerHTML = array[0][m];
+        caseName.classList.add('case', state[m]);
+        caseName.innerHTML = array[0][position];
         NameButton.append(caseName);
       }
-      first.append(NameButton);
       first.append(NameButton);
     }
     //
@@ -124,33 +125,38 @@ function CreateButtons(firstButton, lastButton, count, array) {
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
       NameButton.classList.add(array[0][0], swither[k]);
-      for (let m = 1; m < 3; m += 1) {
+      for (let m = 0; m < 2; m += 1) {
+        position += 1;
         const caseName = document.createElement('span');
-        caseName.classList.add('case', state[m - 1]);
-        caseName.innerHTML = array[0][m];
+        caseName.classList.add('case', state[m]);
+        caseName.innerHTML = array[0][position];
         NameButton.append(caseName);
       }
       first.append(NameButton);
     }
     CreateRow.append(first);
   }
+
   for (let j = 0; j < count; j += 1) {
     const CreateKey = document.createElement('div');
     CreateKey.className = 'key';
     //
+    position = 0;
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
       NameButton.classList.add(array[j + 1][0], swither[k]);
-      for (let m = 1; m < 3; m += 1) {
+      for (let m = 0; m < 2; m += 1) {
+        position += 1;
         const caseName = document.createElement('span');
-        caseName.classList.add('case', state[m - 1]);
-        caseName.innerHTML = array[j + 1][m];
+        caseName.classList.add('case', state[m]);
+        caseName.innerHTML = array[j + 1][position];
         NameButton.append(caseName);
       }
       CreateKey.append(NameButton);
     }
     CreateRow.append(CreateKey);
   }
+
   const last = document.createElement('div');
   last.classList.add('key', lastButton);
   CreateRow.append(last);
@@ -199,12 +205,14 @@ CreateButtons('shift', 'shift-right', 11, keyRow4);
 CreateControlButtons(ClassArray, keyRow5);
 
 const TextArea = document.getElementById('result');
-let key = Array.from(document.getElementsByClassName('key'));
+const key = Array.from(document.getElementsByClassName('key'));
 
 key.forEach((element, index) => {
   element.addEventListener('mousedown', () => {
     key[index].classList.add('active');
-    TextArea.value += key[index].lastElementChild.lastElementChild.textContent;
+    const ActiveSpan = key[index].getElementsByClassName('on');
+    const Activeletter = ActiveSpan[0].getElementsByClassName('down');
+    TextArea.value += Activeletter[0].textContent;
   });
   element.addEventListener('mouseup', () => {
     key[index].classList.remove('active');
@@ -226,19 +234,11 @@ window.addEventListener('keydown', (event) => {
   }
 
   if (event.altKey && event.shiftKey) {
-    const off = document.getElementsByClassName('off');
-    const on = document.getElementsByClassName('on');
-    console.log(off);
-    if (off[0].style.display === 'block') {
-      for (let i = 0; i < off.length; i += 1) {
-        off[i].style.display = 'none';
-        on[i].style.display = 'block';
-      }
-    } else {
-      for (let i = 0; i < off.length; i += 1) {
-        off[i].style.display = 'block';
-        on[i].style.display = 'none';
-      }
+    for (let i = 0; i < key.length; i += 1) {
+      key[i].firstChild.classList.toggle('on');
+      key[i].firstChild.classList.toggle('off');
+      key[i].lastChild.classList.toggle('off');
+      key[i].lastChild.classList.toggle('on');
     }
   }
 });

@@ -74,7 +74,7 @@ const keyRow5 = [
   ['ControlLeft', 'Ctrl', 'Ctrl', 'Ctrl', 'Ctrl'],
   ['MetaLeft', 'Win', 'Win', 'Win', 'Win'],
   ['AltLeft', 'Alt', 'Alt', 'Alt', 'Alt'],
-  ['Space', 'Space', 'Space', 'Space', 'Space'],
+  ['Space', ' ', ' ', ' ', ' '],
   ['AltRight', 'Alt', 'Alt', 'Alt', 'Alt'],
   ['ArrowLeft', '◄', '◄', '◄', '◄'],
   ['ArrowDown', '▼', '▼', '▼', '▼'],
@@ -95,6 +95,14 @@ function CreateKeyboard() {
   document.body.append(keyboard);
 }
 
+function PressCapsLock() {
+  const up = document.getElementsByClassName('case');
+  for (let i = 0; i < up.length; i += 1) {
+    up[i].classList.toggle('up');
+    up[i].classList.toggle('down');
+  }
+}
+
 function CreateButtons(firstButton, lastButton, count, array) {
   let position = 0;
   const CreateRow = document.createElement('div');
@@ -103,8 +111,6 @@ function CreateButtons(firstButton, lastButton, count, array) {
   if (firstButton === '') {
     const first = document.createElement('div');
     first.className = 'key';
-
-    // Function add span
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
       NameButton.classList.add(array[0][0], swither[k]);
@@ -117,7 +123,6 @@ function CreateButtons(firstButton, lastButton, count, array) {
       }
       first.append(NameButton);
     }
-    //
     CreateRow.append(first);
   } else {
     const first = document.createElement('div');
@@ -140,7 +145,6 @@ function CreateButtons(firstButton, lastButton, count, array) {
   for (let j = 0; j < count; j += 1) {
     const CreateKey = document.createElement('div');
     CreateKey.className = 'key';
-    //
     position = 0;
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
@@ -160,7 +164,6 @@ function CreateButtons(firstButton, lastButton, count, array) {
   const last = document.createElement('div');
   last.classList.add('key', lastButton);
   CreateRow.append(last);
-  //
   for (let k = 0; k < 2; k += 1) {
     const NameButton = document.createElement('span');
     NameButton.classList.add(array[array.length - 1][0], swither[k]);
@@ -196,6 +199,13 @@ function CreateControlButtons(array, keyRow) {
   }
 }
 
+function ActiveLetter(key, consist) {
+  const ActiveSpan = key.getElementsByClassName('on');
+  const letter = ActiveSpan[0].getElementsByClassName(consist);
+
+  return letter[0];
+}
+
 CreateTextArea();
 CreateKeyboard();
 CreateButtons('', 'backspace', 12, keyRow1);
@@ -210,27 +220,42 @@ const key = Array.from(document.getElementsByClassName('key'));
 key.forEach((element, index) => {
   element.addEventListener('mousedown', () => {
     key[index].classList.add('active');
-    const ActiveSpan = key[index].getElementsByClassName('on');
-    const Activeletter = ActiveSpan[0].getElementsByClassName('down');
-    TextArea.value += Activeletter[0].textContent;
+    if (key[index].classList[1] === 'alt' || key[index].classList[1] === 'ctrl' || key[index].classList[1] === 'win') {
+      TextArea.value += '';
+    } else if (key[index].classList[1] === 'capslock') {
+      TextArea.value += '';
+      PressCapsLock();
+    } else if (key[index].classList[1] === 'tab') {
+      TextArea.value += '  ';
+    } else if (key[index].classList[1] === 'enter') {
+      TextArea.value += '\n';
+    } else if (key[index].classList[1] === 'del') {
+      TextArea.value = '';
+    } else if (key[index].classList[1] === 'backspace') {
+      TextArea.value = TextArea.value.slice(0, -1);
+    } else if (key[index].classList[1] === 'shift') {
+      PressCapsLock();
+    } else { TextArea.value += ActiveLetter(key[index], 'down').textContent; }
   });
   element.addEventListener('mouseup', () => {
-    key[index].classList.remove('active');
+    if (key[index].classList[1] === 'shift') {
+      key[index].classList.remove('active');
+      PressCapsLock();
+    } else {
+      key[index].classList.remove('active');
+    }
   });
 });
 
 window.addEventListener('keydown', (event) => {
+  TextArea.focus();
   if (event.code) {
     const button = document.getElementsByClassName(event.code);
     button[0].parentElement.classList.add('active');
   }
 
   if (event.code === 'CapsLock') {
-    const up = document.getElementsByClassName('case');
-    for (let i = 0; i < up.length; i += 1) {
-      up[i].classList.toggle('up');
-      up[i].classList.toggle('down');
-    }
+    PressCapsLock();
   }
 
   if (event.altKey && event.shiftKey) {
@@ -249,10 +274,3 @@ window.addEventListener('keyup', (event) => {
     button[0].parentElement.classList.remove('active');
   }
 });
-
-// local storage
-
-TextArea.value = localStorage.getItem('area');
-TextArea.oninput = () => {
-  localStorage.setItem('area', TextArea.value);
-};

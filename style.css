@@ -98,3 +98,7 @@
 .off{
     display: none;
 }
+
+.active-shift{
+    background-color: red;
+}

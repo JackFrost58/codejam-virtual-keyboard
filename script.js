@@ -187,7 +187,7 @@ function CreateControlButtons(array, keyRow) {
     for (let k = 0; k < 2; k += 1) {
       const NameButton = document.createElement('span');
       NameButton.classList.add(keyRow[j][0], swither[k]);
-      for (let m = 1; m < 3; m += 1) { // problem with English word
+      for (let m = 1; m < 3; m += 1) {
         const caseName = document.createElement('span');
         caseName.classList.add('case', state[m - 1]);
         caseName.innerHTML = keyRow[j][m];

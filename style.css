@@ -87,7 +87,6 @@
     font-weight: 600;
     color: grey;
     background-color: #1c232e;
-
 }
 
 .active {
@@ -97,8 +96,4 @@
 .up,
 .off{
     display: none;
-}
-
-.active-shift{
-    background-color: red;
 }
